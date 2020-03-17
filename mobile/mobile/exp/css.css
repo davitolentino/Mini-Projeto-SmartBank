@@ -1,0 +1,43 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.box{
+    position: relative;
+    height: 461px;
+    width: 700px;
+}
+
+.box .screen{
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: 0.5s;
+}
+
+.box:hover .screen.screen5{
+    transform: translateY(-160px);
+    opacity: 1;
+}
+.box:hover .screen.screen4{
+    transform: translateY(-120px);
+    opacity: .8;
+}
+.box:hover .screen.screen3{
+    transform: translateY(-80px);
+    opacity: .6;
+}
+.box:hover .screen.screen2{
+    transform: translateY(-40px);
+    opacity: .4;
+}
+.box:hover .screen.screen1{
+    transform: translateY(0px);
+    opacity: .2;
+}

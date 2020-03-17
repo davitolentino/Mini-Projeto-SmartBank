@@ -1,0 +1,22 @@
+Codigo 1
+
+var {data} = await api.post(`service?tipo=1&valores=%7B%09%09%22nome%22%3A%20%22${'david'}%22,%09%09%22cpf%22%3A%20%22${'44783160821'}%22,%09%09%22dataNasc%22%3A%20%22${'04012001'}%22,%09%09%22endereco%22%3A%20%22${'av santo amaro'}%22,%09%09%22telefone%22%3A%20%22${'19981413209'}%22,%09%09%22senhaLogin%22%3A%20%22${'12345678'}%22,%09%09%22senhaAcesso%22%3A%20%22${'123456'}%22%09%7D`)
+    
+
+Codigo 2
+
+var {data} = await api.post(`service?tipo=${''}&valores=%7B%09%09%22numero_conta%22%3A%20%22${''}%22%09%7D`)
+    
+
+Codigo 3
+
+var {data} = await api.post(`service?tipo=${''}&valores=%7B%09%09%22numero_conta%22%3A%20%22${''}%22,%09%09%22data%22%3A%20%22${''}%22,%09%09%22valor%22%3A%20%22${''}%22,%09%09%22descricao%22%3A%20%22${''}%22%09%7D`)
+
+Codigo 4
+
+var {data} = await api.post(`service?tipo=${''}&valores=%7B%09%09%22numero_conta%22%3A%20%22${''}%22,%09%09%22data%22%3A%20%22${''}%22,%09%09%22valor%22%3A%20%22${''}%22,%09%09%22descricao%22%3A%20%22${''}%22%09%7D`)
+
+
+Codigo 5
+
+var {data} = await api.post(`service?tipo=${''}&valores=%20%7B%09%09%22conta_origem%22%3A%20%22${''}%22,%09%09%22conta_destino%22%3A%20%22${''}%22,%09%09%22data%22%3A%20%22${''}%22,%09%09%22valor%22%3A%20%22${''}%22%09%7D`)

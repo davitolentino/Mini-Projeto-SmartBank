@@ -1,0 +1,95 @@
+DROP DATABASE IF EXISTS banco;
+CREATE DATABASE banco;
+USE banco;
+CREATE TABLE `cliente` (
+  `documento` varchar(11) NOT NULL,
+  `nome` varchar(152) NOT NULL,
+  `dataNasc` date NOT NULL,
+  `endereco` varchar(200) NOT NULL,
+  `telefone` varchar(11) NOT NULL,
+  `sLogin` varchar(16) NOT NULL,
+  `sAcesso` varchar(6) NOT NULL
+);
+
+ALTER TABLE `cliente`
+  ADD PRIMARY KEY (`documento`);
+COMMIT;
+
+CREATE TABLE `conta` (
+  `numero_conta` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `documento` varchar(11) NOT NULL,
+  `saldo` decimal(8,2)
+);
+
+
+ALTER TABLE `conta`
+  ADD CONSTRAINT `fk_conta_cliente` FOREIGN KEY (documento) REFERENCES cliente(documento) ON UPDATE CASCADE;
+
+DELIMITER $$
+CREATE TRIGGER `geraNumero` AFTER INSERT ON `cliente` FOR EACH ROW BEGIN
+	INSERT INTO conta 
+    SET documento = NEW.documento, saldo = 0;
+END
+$$
+DELIMITER ;
+
+CREATE TABLE `transacao` (
+  `numero_conta` int(11) NOT NULL,
+  `tipo` varchar(2) NOT NULL,
+  `data` date,
+  `valor` decimal(8,2) NOT NULL,
+  `descricao` varchar(50),
+  CONSTRAINT `fk_transacao_nconta` FOREIGN KEY (numero_conta) REFERENCES conta(numero_conta) ON UPDATE CASCADE
+);
+
+
+create view vw_sub_transacao as
+select numero_conta,tipo, sum(valor) as total
+from transacao
+group by numero_conta,tipo
+order by numero_conta,tipo;
+
+create view vw_saldos as
+SELECT numero_conta, SUM(CASE WHEN tipo = "CR" THEN total ELSE 0 END) - SUM(CASE WHEN tipo = "DE" THEN total ELSE 0 END) as saldo
+from vw_sub_transacao group by numero_conta;
+
+DELIMITER $$
+CREATE TRIGGER `atualizaSaldo` AFTER INSERT ON `transacao` FOR EACH ROW BEGIN
+	UPDATE conta
+    SET saldo = (select saldo from vw_saldos where numero_conta = NEW.numero_conta)
+	WHERE numero_conta = NEW.numero_conta;
+END
+$$
+DELIMITER ;
+
+-- DADOS PARA TESTAR O FLUXO DE DADOS DO BANCO
+INSERT INTO CLIENTE VALUES
+("11111111111","GERALDO AZEVEDO",DATE_SUB(CURDATE(),INTERVAL 21 YEAR),"RUA DOS INOCENTES, 21","123456789","geraldo","123456"),
+("44444444444","LUIZ GONZAGA",DATE_SUB(CURDATE(),INTERVAL 26 YEAR),"RUA DOS CACETINHOS, 24","987654321","luiz","123456"),
+("33333333333","MARTA RAMOS",DATE_SUB(CURDATE(),INTERVAL 28 YEAR),"RUA DAS AZALELIAS, 547","456789123","marta","123456"),
+("77777777777","JUREMA AGUIAR",DATE_SUB(CURDATE(),INTERVAL 19 YEAR),"RUA DOS DOIDOS, 666","321654789","jurema","123456");
+
+INSERT INTO transacao VALUES
+(1,"CR",DATE_SUB(CURDATE(),INTERVAL 5 DAY),100.00,"DEPOSIDO"),
+(1,"CR",DATE_SUB(CURDATE(),INTERVAL 4 DAY),200.00,"DEPOSIDO"),
+(1,"DE",DATE_SUB(CURDATE(),INTERVAL 4 DAY),98.25,"PAGAMENTO"),
+(1,"DE",DATE_SUB(CURDATE(),INTERVAL 3 DAY),50.00,"SAQUE"),
+(2,"CR",DATE_SUB(CURDATE(),INTERVAL 5 DAY),300.00,"DEPOSIDO"),
+(2,"CR",DATE_SUB(CURDATE(),INTERVAL 4 DAY),200.00,"DEPOSIDO"),
+(2,"DE",DATE_SUB(CURDATE(),INTERVAL 4 DAY),105.75,"PAGAMENTO"),
+(2,"DE",DATE_SUB(CURDATE(),INTERVAL 3 DAY),150.00,"TRANSF. CONTA NUMERO 3"),
+(2,"DE",DATE_SUB(CURDATE(),INTERVAL 2 DAY),50.00,"SAQUE"),
+(3,"CR",DATE_SUB(CURDATE(),INTERVAL 5 DAY),300.00,"DEPOSIDO"),
+(3,"CR",DATE_SUB(CURDATE(),INTERVAL 3 DAY),150.00,"TRANSF. CONTA NUMERO 2"),
+(3,"DE",DATE_SUB(CURDATE(),INTERVAL 3 DAY),105.75,"PAGAMENTO"),
+(3,"DE",DATE_SUB(CURDATE(),INTERVAL 2 DAY),100.00,"SAQUE"),
+(4,"CR",DATE_SUB(CURDATE(),INTERVAL 5 DAY),100.00,"DEPOSIDO"),
+(4,"CR",DATE_SUB(CURDATE(),INTERVAL 4 DAY),200.00,"DEPOSIDO"),
+(4,"DE",DATE_SUB(CURDATE(),INTERVAL 3 DAY),50.00,"SAQUE");
+
+select * from cliente;
+select * from conta order by numero_conta;
+select * from conta where numero_conta = 6;
+select * from transacao;
+select * from vw_sub_transacao where numero_conta = '5';
+select * from vw_saldos where numero_conta = '5';

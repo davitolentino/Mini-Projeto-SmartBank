@@ -1,0 +1,369 @@
+* {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	max-width: 100%;
+}
+
+html, body {
+	font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+		'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+	padding: 0;
+	margin: 0;
+	background-color: #fff;
+	height: 100vh;
+}
+.pop{
+	position:fixed;
+	z-indez:99;
+	left:-100%;
+	bottom:20%;
+	animation-name:pop;
+	animation-duration:15s;
+}
+
+@keyframes pop {
+	0%{
+		left:-100%;
+	}
+	25%{
+		left:0%;
+	}
+	50%{
+		left:0%;
+	}
+	100%{
+		left:-100%;
+	}
+}
+::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+	background: -webkit-linear-gradient(1000deg, rgb(0, 102, 255),
+		rgb(182, 5, 182));
+}
+
+#vitrine .card {
+	background-color: black;
+}
+
+#vitrine-cli .card {
+	background-color: rgb(45, 24, 68);
+	color: rgb(255, 255, 255);
+}
+
+#vitrine, #vitrine-cli {
+	max-width: 100%;
+}
+
+#vitrine a, #vitrine-cli a {
+	position: sticky;
+	top: 100%;
+}
+#vitrine-cli .card-body{
+	background: #fff;
+	border-radius: 10px;
+	color:black;
+}
+#vitrine-cli .card{
+	border-radius: 10px;
+}
+.center {
+	transform: translate(25%, 0%);
+}
+
+.d-center {
+	display: flex;
+	justify-content: center;
+}
+
+.navbar {
+	position: fixed;
+	z-index: 99;
+	top: 0;
+	right: 0;
+	left: 0;
+	transition: 0.4s;
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+
+.navbar #logo {
+	font-size: 35px;
+	font-weight: bold;
+	transition: 0.4s;
+}
+
+.navbar-brand {
+	font-family: 'Fjalla One', sans-serif;
+	font-weight: 20;
+}
+
+.navbar-brand h2 {
+	color: white;
+}
+
+.navbar .nav-link {
+	min-width: 200px;
+	max-width: 250px;
+	font-weight: 500;
+	margin: none;
+	height: 40px;
+	text-align: center;
+	border: none;
+	background-size: 300% 100%;
+	border-radius: 50px;
+	-o-transition: all .4s ease-in-out;
+	-webkit-transition: all .4s ease-in-out;
+	transition: all .4s ease-in-out;
+}
+
+.navbar .nav-link:hover {
+	background-position: 100% 0;
+	-o-transition: all .4s ease-in-out;
+	-webkit-transition: all .4s ease-in-out;
+	transition: all .4s ease-in-out;
+}
+
+.navbar .nav-link:focus {
+	outline: none;
+}
+
+.navbar .nav-link {
+	background-image: linear-gradient(to right, #6253e1, #852D91, rgb(110, 107, 253),
+		rgb(232, 59, 238));
+	box-shadow: 0 4px 15px 0 rgba(126, 52, 161, 0.75);
+}
+
+.carousel {
+	width: 100%;
+	height: 90%;
+	background-color: rgb(192, 192, 192);
+}
+
+.carousel-item {
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	height: 90vh;
+}
+
+#card-vitrine {
+	width: 100%;
+	background-color: #852D91;
+	/*background: rgb(100, 20, 175);
+	background:rgb(43, 0, 122);*/
+}
+
+#card-vitrine .card-img-top img {
+	width: 100%;
+	min-height: 200px;
+	max-height: 300px;
+}
+
+#wave::before {
+	content: "";
+	display: block;
+	background:  url("img/wave.png");
+	background-repeat: repeat-x;
+	background-size: 1280px 129px;
+	height: 129px;
+	opacity: 0.8;
+	transform: translateY(100px);
+	animation: wave-reverse 10s linear infinite;
+}
+#wave::after {
+	content: "";
+	display: block;
+	background: transparent ;
+	background-image: url("img/wave.png");
+	background-repeat: repeat-x;
+	background-size: 1280px 129px; 
+	transform: translateY(2px);
+	height: 129px;
+	animation:wave 10s linear infinite;
+}
+@-webkit-keyframes wave {
+	0%{
+		background-position: 0;
+	}
+	100%{
+		background-position:1280px;
+	}
+}
+@-webkit-keyframes wave-reverse {
+	0%{
+		background-position: 1280px;
+	}
+	100%{
+		background-position:0;
+	}
+}
+#card-vitrine .card {
+	background: rgba(44, 3, 63, 0.8);
+	color: #fff;
+	border-radius: 5px;
+	border: none;
+}
+
+#card-vitrine .card-deck {
+	padding: 50px;
+}
+
+#card-vitrine .card:hover {
+	transform: scale(1.05);
+}
+
+#card-vitrine img {
+	border: none;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+}
+
+#login .card-header {
+	background-color: transparent;
+}
+
+#login {
+	display: flex;
+	justify-content: center;
+	position: relative;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 2;
+}
+
+#login .card {
+	background-color: rgba(245, 245, 245, 0.9);
+	color: white;
+	border-radius: 10px;
+	border: none;
+}
+
+#login .input-group {
+	margin-bottom: 40px;
+}
+
+#login .form-control, .input-group-text {
+	background-color: transparent;
+	border: none;
+	border-bottom: 1px rgb(192, 192, 192) solid;
+	border-radius: 0;
+}
+
+#login .form-control:focus, .input-group-text {
+	background-color: transparent;
+	box-shadow: none;
+	color: black;
+}
+
+#login .btn {
+	margin-bottom: 5%;
+	border-radius: 20px;
+	width: 100%;
+	background-color: #852D91;
+	color: white;
+	font-weight: 600;
+}
+
+#login a {
+	color: rgb(109, 23, 109);
+}
+
+#login a:hover {
+	text-decoration: none;
+	color: rgb(158, 10, 158);
+}
+
+#login h2 {
+	color: rgb(127, 13, 138);
+	font-family: 'Fjalla One', sans-serif;
+}
+
+#cliente .card-header {
+	background-color: #852D91;
+}
+
+#cliente {
+	display: flex;
+	justify-content: center;
+	position: relative;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 2;
+}
+
+#cliente .card {
+	background-color: rgba(245, 245, 245, 0.9);
+	color: white;
+	border-radius: 30px;
+	border: none;
+}
+
+#cliente .input-group {
+	margin-bottom: 40px;
+}
+
+#cliente .form-control, .input-group-text {
+	background-color: transparent;
+	border: none;
+	border-bottom: 1px rgb(192, 192, 192) solid;
+	border-radius: 0;
+}
+
+#cliente .form-control:focus, .input-group-text {
+	background-color: transparent;
+	box-shadow: none;
+	color: black;
+}
+
+#cliente .btn {
+	margin-top: 30px;
+	margin-bottom: 5%;
+	border-radius: 20px;
+	width: 100%;
+	background-color: #852D91;
+	color: white;
+	font-weight: 600;
+}
+
+#cliente a {
+	color: rgb(109, 23, 109);
+}
+
+#cliente a:hover {
+	text-decoration: none;
+	color: rgb(158, 10, 158);
+}
+
+#cliente h2 {
+	color: rgb(127, 13, 138);
+	font-family: 'Fjalla One', sans-serif;
+}
+
+.rodape {
+	width: 100%;
+	background-color: rgb(31, 31, 31);
+	font-size: small;
+	/*background-color: rgb(63, 1, 134);*/
+}
+
+.k {
+	padding-top: 250px;
+}
+
+.t {
+	color: black;
+	padding-right: 30px;
+}
+
+.z{
+	background-color: #852D91;
+}

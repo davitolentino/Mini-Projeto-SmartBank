@@ -1,0 +1,9 @@
+{"nome":"Reenye","cpf":"37685890801", "dataNasc":"22081992","endereco":"Rua Sem Saida", "telefone":"19995158122","senhaLogin":"teste1234", "senhaAcesso":"123456"}
+
+{"numeroConta":"3"}
+ 
+{"numeroConta":"5", "data": "26012020", "valor":"500.00", "descricao":"Deposito"}
+{"numeroConta":"5", "data": "26012020", "valor":"50.00", "descricao":"Pagamento Celular"}
+
+{"contaOrigem":"5", "contaDestino":"3", "data":"26012020", "valor":"10.00"}
+

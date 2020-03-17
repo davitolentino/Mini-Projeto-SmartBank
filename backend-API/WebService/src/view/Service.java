@@ -1,0 +1,552 @@
+package view;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import control.Auxiliar;
+import control.ConnectionDB;
+
+@WebServlet("/service")
+public class Service extends HttpServlet {
+
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+		JSONObject input = new JSONObject();
+		JSONObject ret = new JSONObject();
+
+		ConnectionDB db = new ConnectionDB();
+
+		PrintWriter out = resp.getWriter();
+
+		String tipo = req.getParameter("tipo");
+		String valores = req.getParameter("valores");
+		String id = req.getParameter("id");
+
+		if ((req.getHeader("tipo") != null) && (req.getHeader("valores") != null) && (req.getHeader("id") != null)) {
+
+			/*
+			 * System.out.println("Body - " + req.getHeader("tipo"));
+			 * System.out.println("Valores - " + req.getHeader("valores"));
+			 * 
+			 * JSONObject teste = new JSONObject(req.getHeader("valores"));
+			 * System.out.println("Valores - " + teste.toString());
+			 */
+
+			tipo = req.getHeader("tipo");
+			valores = req.getHeader("valores");
+			id = req.getHeader("id");
+
+		}
+
+		String absolutePath = req.getServletPath();
+		
+		System.out.println(absolutePath);
+		
+		Auxiliar aux = new Auxiliar();
+
+		boolean retArr = false;
+
+		if (tipo != null) {
+
+			if (id != null) {
+
+				if ((valores != null) || (tipo.equals("8"))) {
+
+					// System.out.println(valores);
+
+					input = new JSONObject(valores);
+					
+
+					switch (tipo) {
+
+					// Cadastrar nova conta
+					case "1":
+
+						try {
+
+							String nomeCli = input.getString("nome");
+							String documento = input.getString("cpf");
+							String nasc = input.getString("dataNasc");
+							String endereco = input.getString("endereco");
+							String tel = input.getString("telefone");
+							String sLogin = input.getString("senhaLogin");
+							String sAcess = input.getString("senhaAcesso");
+
+							if (checkAccount(db, 1, documento)) {
+								// CPF Ja cadastrado
+								ret.put("cod", "106");
+								break;
+							}
+
+							/*
+							 * System.out.println(nomeCli.length()); System.out.println(documento.length());
+							 * System.out.println(nasc.length()); System.out.println(tel.length());
+							 * System.out.println(sLogin.length()); System.out.println(sAcess.length());
+							 */
+
+							// Verifica comprimento dos valores
+							if ((nomeCli.length() > 152) || (documento.length() != 11) || (nasc.length() != 8)
+									|| (tel.length() != 11) || ((sLogin.length() < 8) || (sLogin.length() > 16))
+									|| (sAcess.length() != 6)) {
+
+								// Parametros fora do escopo
+								ret.put("cod", "101");
+								break;
+
+							}
+
+							// Senha de acesso invalida
+							if (!aux.isNumber(sAcess)) {
+								ret.put("cod", "102");
+								break;
+							}
+
+							// CPF invalido
+							if (!aux.isCPF(documento)) {
+								ret.put("cod", "103");
+								break;
+							}
+
+							// Data invalida
+							if (!aux.isData(nasc)) {
+								ret.put("cod", "104");
+							}
+
+							String dataNasc = aux.formatDate(nasc);
+
+							String query = "INSERT INTO cliente (documento, nome, dataNasc, endereco, telefone, sLogin, sAcesso, id) "
+									+ "VALUES (?,?,?,?,?,?,?,?)";
+
+							String[] data = { documento, nomeCli, dataNasc, endereco, tel, sLogin, sAcess, id };
+
+							if (db.insertData(query, data)) {
+								// Sucesso ao inserir
+								ret.put("numero_conta", numeroConta(db, documento));
+							} else {
+								// Erro inesperado
+								ret.put("cod", "105");
+							}
+
+						} catch (JSONException e) {
+
+							// Campo não encontrado
+							if (e.toString().contains("not found")) {
+								ret.put("cod", "007");
+							}
+
+						}
+
+						break;
+
+					// Consultar Saldo
+					case "2":
+
+						try {
+
+							String numeroConta = input.getString("numero_conta");
+
+							if (!checkAccount(db, 0, numeroConta)) {
+								// Conta não existe
+								ret.put("cod", "010");
+								break;
+							}
+
+							String query = "select numero_conta, saldo from conta where numero_conta = ?";
+
+							String[] data = { numeroConta };
+
+							JSONArray result = db.query(query, data);
+
+							JSONObject obj = (JSONObject) result.get(0);
+
+							if (result != null) {
+
+								// System.out.println(result);
+								ret.put("saldo", obj.getString("saldo"));
+
+							}
+
+						} catch (JSONException e) {
+
+							// Campo não encontrado
+							if (e.toString().contains("not found")) {
+								ret.put("cod", "007");
+							}
+
+						}
+
+						break;
+
+					// Saque
+					case "3":
+						// Deposito
+					case "4":
+
+						try {
+
+							String nConta = input.getString("numero_conta");
+
+							if (!checkAccount(db, 0, nConta)) {
+								// Conta não existe
+								ret.put("cod", "010");
+								break;
+							}
+
+							String operacao = tipo.equals("3") ? "DE" : "CR";
+							String dia = input.getString("data");
+							String valor = input.getString("valor");
+							String descricao = input.getString("descricao");
+							
+							valor = valor.replace(",",".");
+
+							if ((saldo(db, nConta) >= Float.parseFloat(valor)) || (tipo.equals("4"))) {
+
+								String query = "INSERT INTO transacao (numero_conta, tipo, data, valor, descricao) VALUES (?, ?, ?, ?, ?);";
+
+								String[] data = { nConta, operacao, aux.formatDate(dia), valor, descricao };
+
+								if (db.insertData(query, data)) {
+									// Sucesso
+									ret.put("saldo", saldo(db, nConta));
+								} else {
+									// Erro inesperado
+									ret.put("cod", "305");
+								}
+
+							} else {
+
+								// Saldo insuficiente
+								ret.put("cod", "301");
+
+							}
+
+						} catch (JSONException e) {
+
+							// Campo não encontrado
+							if (e.toString().contains("not found")) {
+								ret.put("cod", "007");
+							}
+
+						}
+
+						break;
+
+					// Transferencia
+					case "5":
+
+						try {
+
+							String nContao = input.getString("conta_origem");
+							String nContad = input.getString("conta_destino");
+							String dia = input.getString("data");
+							String valor = input.getString("valor");
+
+							if ((!checkAccount(db, 0, nContao)) || (!checkAccount(db, 0, nContad))) {
+								// Conta não existe
+								ret.put("cod", "010");
+							} else {
+
+								if (saldo(db, nContao) >= Float.parseFloat(valor)) {
+
+									String descricao = "TRANSF. CONTA NUMERO " + nContad;
+
+									String query = "INSERT INTO transacao (numero_conta, tipo, data, valor, descricao) VALUES (?, 'DE', ?, ?, ?);";
+
+									String[] data = { nContao, aux.formatDate(dia), valor, descricao };
+
+									if (db.insertData(query, data)) {
+
+										descricao = "TRANSF. CONTA NUMERO " + nContao;
+
+										query = "INSERT INTO transacao (numero_conta, tipo, data, valor, descricao) VALUES (?, 'CR', ?, ?, ?);";
+
+										data = new String[] { nContad, aux.formatDate(dia), valor, descricao };
+
+										if (db.insertData(query, data)) {
+											// Sucesso
+											ret.put("saldo", saldo(db, nContao));
+										} else {
+											// Erro inesperado
+											ret.put("cod", "305");
+										}
+
+									} else {
+										// Erro inesperado
+										ret.put("cod", "305");
+									}
+
+								} else {
+
+									// Saldo insuficiente
+									ret.put("cod", "301");
+
+								}
+
+							}
+
+						} catch (JSONException e) {
+
+							// Campo não encontrado
+							if (e.toString().contains("not found")) {
+								ret.put("cod", "007");
+							}
+
+						}
+
+						break;
+
+					// Autenticação
+					case "6":
+
+						try {
+
+							String documento = input.getString("documento");
+							String senha = input.getString("senhaAcesso");
+
+							String query = "SELECT * FROM cliente INNER JOIN conta ON cliente.documento = conta.documento WHERE cliente.documento = ? AND sAcesso = ?";
+
+							String[] data = new String[] { documento, senha };
+
+							JSONArray arr = db.query(query, data);
+
+							if (arr.length() > 0) {
+
+								JSONObject obj = (JSONObject) arr.get(0);
+
+								ret.put("numero_conta", obj.getString("numero_conta"));
+								ret.put("nome", obj.getString("nome"));
+								ret.put("dataNasc", obj.getString("dataNasc"));
+								ret.put("endereco", obj.getString("endereco"));
+								ret.put("telefone", obj.getString("telefone"));
+
+							} else {
+								// Conta não existe
+								ret.put("cod", "010");
+							}
+
+						} catch (JSONException e) {
+
+							// Campo não encontrado
+							if (e.toString().contains("not found")) {
+								ret.put("cod", "007");
+							}
+
+						}
+
+						break;
+
+					// Extrato Bancario
+					case "7":
+
+						try {
+
+							String numeroConta = input.getString("numero_conta");
+							String dataInicio = input.getString("inicio_periodo");
+							
+							String[] data;
+							String query;
+							
+							if(!dataInicio.equals("total")) {
+								String dataFim = input.getString("fim_periodo");
+								query = "SELECT * FROM transacao WHERE numero_conta = ? AND data >= ? AND data <= ?";
+
+								data = new String[] { numeroConta, aux.formatDate(dataInicio),
+										aux.formatDate(dataFim) };
+							}else {
+								query = "SELECT * FROM transacao WHERE numero_conta = ?";
+								data = new String[] { numeroConta };
+							}
+
+							JSONArray arr = db.query(query, data);
+							
+							System.out.println(arr);
+
+							if (arr.length() > 0) {
+
+								retArr = true;
+
+								out.print(arr);
+
+							} else {
+								// Conta não existe
+								//ret.put("cod", "010");
+								retArr = true;
+
+								out.print("[]");						
+							}
+
+						} catch (JSONException e) {
+
+							// Campo não encontrado
+							if (e.toString().contains("not found")) {
+								ret.put("cod", "007");
+							}
+
+						}
+
+						/*
+						 * try {
+						 * 
+						 * String numeroConta = input.getString("numero_conta");
+						 * 
+						 * String query = "select * from transacao where numero_conta = ?";
+						 * 
+						 * String[] data = new String[] { numeroConta };
+						 * 
+						 * JSONArray arr = db.query(query, data);
+						 * 
+						 * if(arr.length() > 0) {
+						 * 
+						 * retArr = true;
+						 * 
+						 * out.print(arr);
+						 * 
+						 * }else { //Conta não existe ret.put("cod", "010"); }
+						 * 
+						 * }catch(JSONException e) {
+						 * 
+						 * //Campo não encontrado if(e.toString().contains("not found")) {
+						 * ret.put("cod", "007"); }
+						 * 
+						 * }
+						 */
+
+						break;
+
+					// Relação de Contas
+					case "8":
+
+						try {
+
+							String query = "SELECT cliente.documento, cliente.nome, cliente.dataNasc, cliente.endereco, cliente.telefone, "
+									+ "conta.numero_conta, conta.saldo FROM cliente "
+									+ "INNER JOIN conta ON cliente.documento = conta.documento "
+									+ "WHERE cliente.id = ?";
+
+							String[] data = new String[] { id };
+
+							JSONArray arr = db.query(query, data);
+
+							if (arr.length() > 0) {
+
+								retArr = true;
+
+								out.print(arr);
+
+							} else {
+								// Conta não existe
+								ret.put("cod", "010");
+							}
+
+						} catch (JSONException e) {
+
+							// Campo não encontrado
+							if (e.toString().contains("not found")) {
+								ret.put("cod", "007");
+							}
+
+						}
+
+						break;
+
+					/*
+					 * //Validação do codigo de barras case "": break;
+					 * 
+					 * //Pagamento com codigo de barras case "": break;
+					 */
+
+					// Opcao invalida
+					default:
+						break;
+
+					}
+
+				} else {
+
+					// Valores não recebidos
+					ret.put("cod", "002");
+
+				}
+
+			} else {
+
+				// ID não recebido
+				ret.put("cod", "003");
+
+			}
+
+		} else {
+
+			// Tipo não recebido
+			ret.put("cod", "001");
+
+		}
+
+		if (!retArr) {
+			System.out.println(ret.toString());
+			out.print(ret.toString());
+		}
+
+	}
+
+	private String numeroConta(ConnectionDB db, String documento) {
+
+		String query = "select numero_conta from conta where documento = ?";
+
+		String[] data = { documento };
+
+		JSONArray result = db.query(query, data);
+
+		JSONObject obj = result.getJSONObject(0);
+
+		return obj.getString("numero_conta");
+
+	}
+
+	private float saldo(ConnectionDB db, String numeroConta) {
+
+		String query = "select numero_conta, saldo from conta where numero_conta = ?";
+
+		String[] data = { numeroConta };
+
+		JSONArray result = db.query(query, data);
+
+		JSONObject obj = result.getJSONObject(0);
+
+		return Float.parseFloat(obj.getString("saldo"));
+
+	}
+
+	private boolean checkAccount(ConnectionDB db, int tipo, String info) {
+
+		String query = "select numero_conta from conta where numero_conta = ?;";
+
+		if (tipo == 1) {
+			query = "select numero_conta from conta where documento = ?;";
+		}
+
+		String[] data = { info };
+
+		JSONArray result = db.query(query, data);
+
+		if (result.length() > 0)
+			return true;
+
+		return false;
+
+	}
+
+}

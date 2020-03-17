@@ -1,0 +1,28 @@
+
+jan 27, 2020 09:58:36.83 NEW SESSION
+jan 27, 2020 09:58:36.83 [5580:4888:0127/095836.807:ERROR:os_crypt_win.cc(61)] Failed to decrypt: Chave inválida para uso no estado especificado. (0x8009000B)
+
+jan 29, 2020 11:25:22.42 NEW SESSION
+jan 29, 2020 11:25:22.42 [2832:7988:0129/112522.393:ERROR:os_crypt_win.cc(61)] Failed to decrypt: Chave inválida para uso no estado especificado. (0x8009000B)
+
+fev 04, 2020 11:19:43.23 NEW SESSION
+fev 04, 2020 11:19:43.23 [2364:9260:0204/111943.223:ERROR:os_crypt_win.cc(61)] Failed to decrypt: Chave inválida para uso no estado especificado. (0x8009000B)
+
+fev 18, 2020 06:37:05.42 NEW SESSION
+fev 18, 2020 06:37:05.42 [5900:6204:0218/063705.395:ERROR:os_crypt_win.cc(92)] Failed to decrypt: Chave inválida para uso no estado especificado. (0x8009000B)
+
+fev 20, 2020 06:41:37.83 NEW SESSION
+fev 20, 2020 06:41:37.83 [3192:7460:0220/064137.806:ERROR:os_crypt_win.cc(92)] Failed to decrypt: Chave inválida para uso no estado especificado. (0x8009000B)
+
+mar 03, 2020 11:03:05.05 NEW SESSION
+mar 03, 2020 11:03:05.05 [7236:7240:0303/110305.025:ERROR:os_crypt_win.cc(92)] Failed to decrypt: Chave inválida para uso no estado especificado. (0x8009000B)
+
+mar 05, 2020 07:47:03.62 NEW SESSION
+mar 05, 2020 07:47:03.66 [1356:12476:0305/074703.619:ERROR:connection_factory_impl.cc(420)] Failed to connect to MCS endpoint with error -106
+mar 05, 2020 07:47:29.36 [1356:12476:0305/074729.360:ERROR:connection_factory_impl.cc(420)] Failed to connect to MCS endpoint with error -106
+mar 05, 2020 07:48:21.32 [1356:12476:0305/074821.328:ERROR:connection_factory_impl.cc(420)] Failed to connect to MCS endpoint with error -106
+mar 05, 2020 07:49:58.80 [1356:12476:0305/074958.806:ERROR:connection_factory_impl.cc(420)] Failed to connect to MCS endpoint with error -106
+mar 05, 2020 07:51:27.69 [1356:12476:0305/075127.696:ERROR:connection_factory_impl.cc(420)] Failed to connect to MCS endpoint with error -105
+mar 05, 2020 07:51:56.95 [1356:12476:0305/075156.951:ERROR:connection_factory_impl.cc(420)] Failed to connect to MCS endpoint with error -118
+mar 05, 2020 07:51:56.95 [1356:10328:0305/075156.952:ERROR:gcm_channel_status_request.cc(145)] GCM channel request failed.
+mar 05, 2020 07:52:58.30 [1356:12476:0305/075258.307:ERROR:connection_factory_impl.cc(420)] Failed to connect to MCS endpoint with error -118
